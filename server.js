@@ -1,5 +1,4 @@
 var express = require('express');
-const co = require('co');
 var bodyParser = require("body-parser");
 var hostname = 'localhost';
 var port;
