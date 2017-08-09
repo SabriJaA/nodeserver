@@ -1,13 +1,17 @@
 var express = require('express');
 var hostname = 'localhost';
+var port;
+var urlmongo = '';
+var hostname = '';
 var prod = true;
 if (prod) {
-    var port = 27017;
-    var urlmongo = "mongodb://uiqih4yxnei1hpm:wmKFfwvWZufjvb3TGr0V@bus1nkbynrpnrwo-mongodb.services.clever-cloud.com:27017/bus1nkbynrpnrwo";
-    var hostname = 'memento.cleverapps.io';
+    port = 27017;
+    port = 8080;
+    urlmongo = "mongodb://uiqih4yxnei1hpm:wmKFfwvWZufjvb3TGr0V@bus1nkbynrpnrwo-mongodb.services.clever-cloud.com:27017/bus1nkbynrpnrwo";
+    hostname = 'memento.cleverapps.io';
 } else {
-    var port = 3000;
-    var urlmongo = "mongodb://localhost/db_test_2";
+    port = 3000;
+    urlmongo = "mongodb://localhost/db_test_2";
 }
 var mongoose = require('mongoose');
 var options = {
