@@ -17,7 +17,7 @@ var options = {
     server: {socketOptions: {keepAlive: 300000, connectTimeoutMS: 30000}},
     replset: {socketOptions: {keepAlive: 300000, connectTimeoutMS: 30000}}
 };
-mongoose.connect(urlmongo, { useMongoClient: true });
+mongoose.connect(urlmongo);
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'Erreur lors de la connexion'));
 db.once('open', function () {
