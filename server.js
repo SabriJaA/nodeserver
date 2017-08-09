@@ -32,7 +32,8 @@ app.use(function (req, res, next) {
 var piscineSchema = mongoose.Schema({
     name: String,
     list: Array,
-    search: String
+    search: String,
+    icon: String
 });
 var listSchema = mongoose.Schema({
     name: String,
@@ -60,6 +61,7 @@ myRouter.route('/addCategory')
         var piscine = new Piscine();
         piscine.name = req.body.name;
         piscine.search = req.body.search;
+        piscine.icon = req.body.icon;
         piscine.list = [];
         piscine.save(function (err) {
             if (err) {
