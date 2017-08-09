@@ -1,12 +1,12 @@
 var express = require('express');
 var hostname = 'localhost';
-var prod = true;
+var prod = false;
 if (prod) {
     var port = 27017;
     var urlmongo = "mongodb://uiqih4yxnei1hpm:wmKFfwvWZufjvb3TGr0V@bus1nkbynrpnrwo-mongodb.services.clever-cloud.com:27017/bus1nkbynrpnrwo";
 } else {
     var port = 3000;
-    var urlmongo = "mongodb://localhost/db_test";
+    var urlmongo = "mongodb://localhost/db_test_2";
 }
 var mongoose = require('mongoose');
 var options = {
