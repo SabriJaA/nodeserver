@@ -3,16 +3,20 @@ var bodyParser = require("body-parser");
 var mongoose = require('mongoose');
 var port;
 var urlmongo = '';
-var hostname = '127.0.0.1';
+var hostname = '0.0.0.0';
 var prod = true;
+
 if (prod) {
     port = 8080;
     urlmongo = "mongodb://uiqih4yxnei1hpm:wmKFfwvWZufjvb3TGr0V@bus1nkbynrpnrwo-mongodb.services.clever-cloud.com:27017/bus1nkbynrpnrwo";
     hostname = 'memento.cleverapps.io';
+    var hostname = '0.0.0.0';
 } else {
     port = 3000;
+    hostname = 'localhost';
     urlmongo = "mongodb://localhost/db_test_2";
 }
+
 var options = {
     server: {socketOptions: {keepAlive: 300000, connectTimeoutMS: 30000}},
     replset: {socketOptions: {keepAlive: 300000, connectTimeoutMS: 30000}}
@@ -24,6 +28,8 @@ db.once('open', function () {
     console.log("Connexion à la base OK");
 });
 var app = express();
+app.set('port', process.env.PORT || port);
+app.set('host', process.env.HOST || hostname);
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 app.use(function (req, res, next) {
