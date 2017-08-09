@@ -6,8 +6,8 @@ var urlmongo = '';
 var hostname = '';
 var prod = true;
 if (prod) {
-    port = 27017;
-    urlmongo = "mongodb://uiqih4yxnei1hpm:wmKFfwvWZufjvb3TGr0V@bus1nkbynrpnrwo-mongodb.services.clever-cloud.com:"+port+"/bus1nkbynrpnrwo";
+    port = 8080;
+    urlmongo = "mongodb://uiqih4yxnei1hpm:wmKFfwvWZufjvb3TGr0V@bus1nkbynrpnrwo-mongodb.services.clever-cloud.com:27017/bus1nkbynrpnrwo";
     hostname = 'memento.cleverapps.io';
 } else {
     port = 3000;
@@ -16,10 +16,9 @@ if (prod) {
 var mongoose = require('mongoose');
 var options = {
     server: {socketOptions: {keepAlive: 300000, connectTimeoutMS: 30000}},
-    replset: {socketOptions: {keepAlive: 300000, connectTimeoutMS: 30000}},
-    useMongoClient: true
+    replset: {socketOptions: {keepAlive: 300000, connectTimeoutMS: 30000}}
 };
-mongoose.connect(urlmongo, options);
+mongoose.connect(urlmongo, { useMongoClient: true });
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'Erreur lors de la connexion'));
 db.once('open', function () {
