@@ -1,10 +1,9 @@
 var express = require('express');
 var bodyParser = require("body-parser");
 var mongoose = require('mongoose');
-var hostname = 'localhost';
 var port;
 var urlmongo = '';
-var hostname = '0.0.0.0';
+var hostname = '127.0.0.1';
 var prod = true;
 if (prod) {
     port = 8080;
