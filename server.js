@@ -7,8 +7,7 @@ var hostname = '';
 var prod = true;
 if (prod) {
     port = 27017;
-    port = 8080;
-    urlmongo = "mongodb://uiqih4yxnei1hpm:wmKFfwvWZufjvb3TGr0V@bus1nkbynrpnrwo-mongodb.services.clever-cloud.com:27017/bus1nkbynrpnrwo";
+    urlmongo = "mongodb://uiqih4yxnei1hpm:wmKFfwvWZufjvb3TGr0V@bus1nkbynrpnrwo-mongodb.services.clever-cloud.com:"+port+"/bus1nkbynrpnrwo";
     hostname = 'memento.cleverapps.io';
 } else {
     port = 3000;
