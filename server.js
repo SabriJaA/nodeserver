@@ -1,4 +1,6 @@
 var express = require('express');
+const co = require('co');
+var bodyParser = require("body-parser");
 var hostname = 'localhost';
 var port;
 var urlmongo = '';
@@ -25,7 +27,6 @@ db.once('open', function () {
     console.log("Connexion à la base OK");
 });
 var app = express();
-var bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 app.use(function (req, res, next) {
