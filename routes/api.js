@@ -8,7 +8,7 @@ mongoose.connect('mongodb://localhost/messenger');
 
 const app = require('express')();
 var http = require('http').Server(app);
-var io = require('socket.io')(http);
+/*var io = require('socket.io')(http);
 
 io.on('connection', function (socket) {
 
@@ -24,7 +24,7 @@ io.on('connection', function (socket) {
     databaseStore(message)
   });
 
-});
+});*/
 
 function databaseStore(message) {
   var storeData = { chatMessage: message, timestamp: new Date().getTime() }
