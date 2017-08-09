@@ -1,9 +1,10 @@
 var express = require('express');
 var bodyParser = require("body-parser");
+var mongoose = require('mongoose');
 var hostname = 'localhost';
 var port;
 var urlmongo = '';
-var hostname = '';
+var hostname = '0.0.0.0';
 var prod = true;
 if (prod) {
     port = 8080;
@@ -13,7 +14,6 @@ if (prod) {
     port = 3000;
     urlmongo = "mongodb://localhost/db_test_2";
 }
-var mongoose = require('mongoose');
 var options = {
     server: {socketOptions: {keepAlive: 300000, connectTimeoutMS: 30000}},
     replset: {socketOptions: {keepAlive: 300000, connectTimeoutMS: 30000}}
