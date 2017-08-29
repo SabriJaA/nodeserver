@@ -1,10 +1,11 @@
 var express = require('express');
 var bodyParser = require("body-parser");
 var mongoose = require('mongoose');
+var jwt    = require('jsonwebtoken'); // used to create, sign, and verify tokens
 var port;
 var urlmongo = '';
 var hostname = '0.0.0.0';
-var prod = true;
+var prod = false;
 
 if (prod) {
 	port = 8080;
@@ -60,6 +61,8 @@ var List = mongoose.model('List', listSchema);
 var User = mongoose.model('User', userShema);
 
 var myRouter = express.Router();
+
+
 myRouter.route('/')
 	.all(function (req, res) {
 		res.json({message: "Bienvenue sur notre Frugal API ", methode: req.method});
@@ -83,21 +86,59 @@ myRouter.route('/addUser')
 		});
 	});
 
-myRouter.route('/loggin')
+/*myRouter.route('/loggin')
 	.post(function (req, res) {
 		console.log(req.body);
-		User.find({email: req.body.email, password: req.body.password}, function (err, user) {
+		User.findOne({email: req.body.email, password: req.body.password}, function (err, user) {
 			if (err)
 				res.send(err);
 			var userFind;
 			if(user.length){
-				userFind = user[0];
+				userFind = user;
 			} else {
 				userFind = false;
 			}
 			res.json(userFind);
 		});
-	})
+	})*/
+
+myRouter.route('/loggin')
+	.post(function(req, res) {
+	var info;
+    // find the user
+    User.findOne({
+        email: req.body.email
+    }, function(err, user) {
+
+        if (err) {info = err};
+
+        if (!user) {
+            info = { success: false, message: 'Authentication failed. User not found.' };
+        } else if (user) {
+
+            // check if password matches
+            if (user.password != req.body.password) {
+                info = { success: false, message: 'Authentication failed. Wrong password.' };
+            } else {
+
+                // if user is found and password is right
+                // create a token
+                /*var token = jwt.sign(user, app.get('superSecret'), {
+                    expiresInMinutes: 1440 // expires in 24 hours
+                });*/
+                info = {
+                    success: true,
+                    message: 'Enjoy your token!',
+                    token: ''
+                }
+
+                // return the information including token as JSON
+            }
+
+        }
+        res.json(info);
+    });
+});
 //FB
 myRouter.route('/findUserByIdFB/:id')
 	.get(function (req, res) {
@@ -243,6 +284,41 @@ myRouter.route('/updateList/:id')
 
 
 app.use(myRouter);
+
 app.listen(port, hostname, function () {
 	console.log("Mon serveur fonctionne sur http://" + hostname + ":" + port);
 });
+
+
+/*
+myRouter.use(function(req, res, next) {
+
+  // check header or url parameters or post parameters for token
+  var token = req.body.token || req.query.token || req.headers['x-access-token'];
+
+  // decode token
+  if (token) {
+
+    // verifies secret and checks exp
+    jwt.verify(token, app.get('superSecret'), function(err, decoded) {
+      if (err) {
+        return res.json({ success: false, message: 'Failed to authenticate token.' });
+      } else {
+        // if everything is good, save to request for use in other routes
+        req.decoded = decoded;
+        next();
+      }
+    });
+
+  } else {
+
+    // if there is no token
+    // return an error
+    return res.status(403).send({
+        success: false,
+        message: 'No token provided.'
+    });
+
+  }
+});
+ */
