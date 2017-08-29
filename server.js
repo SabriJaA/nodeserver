@@ -4,7 +4,7 @@ var mongoose = require('mongoose');
 var port;
 var urlmongo = '';
 var hostname = '0.0.0.0';
-var prod = true;
+var prod = false;
 
 if (prod) {
 	port = 8080;
@@ -52,7 +52,8 @@ var userShema = mongoose.Schema({
 	first_name: String,
 	last_name: String,
 	email: String,
-	id: Number
+	id: Number,
+	password: String
 });
 var Piscine = mongoose.model('Test', piscineSchema);
 var List = mongoose.model('List', listSchema);
@@ -72,6 +73,7 @@ myRouter.route('/addUser')
 		user.first_name = req.body.first_name;
 		user.last_name = req.body.last_name;
 		user.email = req.body.email;
+		user.password = (req.body.password) ? req.body.password : '';
 		user.id = req.body.id;
 		user.save(function (err) {
 			if (err) {
@@ -81,8 +83,23 @@ myRouter.route('/addUser')
 		});
 	});
 
+myRouter.route('/loggin')
+	.post(function (req, res) {
+		console.log(req.body);
+		User.find({email: req.body.email, password: req.body.password}, function (err, user) {
+			if (err)
+				res.send(err);
+			var userFind;
+			if(user.length){
+				userFind = user[0];
+			} else {
+				userFind = false;
+			}
+			res.json(userFind);
+		});
+	})
 //FB
-myRouter.route('/findUserById/:id')
+myRouter.route('/findUserByIdFB/:id')
 	.get(function (req, res) {
 		console.log(req.params.id);
 		User.find({id: req.params.id}, function (err, user) {
