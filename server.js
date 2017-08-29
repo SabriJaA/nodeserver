@@ -5,7 +5,7 @@ var jwt    = require('jsonwebtoken'); // used to create, sign, and verify tokens
 var port;
 var urlmongo = '';
 var hostname = '0.0.0.0';
-var prod = false;
+var prod = true;
 
 if (prod) {
 	port = 8080;
