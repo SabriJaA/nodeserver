@@ -41,11 +41,12 @@ app.use(function (req, res, next) {
 	next()
 })
 app.set('superSecret', config.secret); // secret variable
-var piscineSchema = mongoose.Schema({
+var categorySchema = mongoose.Schema({
 	name: String,
 	list: Array,
 	search: String,
-	icon: String
+	icon: String,
+	userId: String
 });
 var listSchema = mongoose.Schema({
 	name: String,
@@ -58,7 +59,7 @@ var userShema = mongoose.Schema({
 	id: Number,
 	password: String
 });
-var Piscine = mongoose.model('Test', piscineSchema);
+var Category = mongoose.model('Category', categorySchema);
 var List = mongoose.model('List', listSchema);
 var User = mongoose.model('User', userShema);
 
@@ -186,7 +187,7 @@ myRouter.route('/deleteUserById/:id')
 
 myRouter.route('/category')
 	.get(function (req, res) {
-		Piscine.find(function (err, piscines) {
+		Category.find(function (err, piscines) {
 			if (err) {
 				res.send(err);
 			}
@@ -195,23 +196,48 @@ myRouter.route('/category')
 	});
 myRouter.route('/addCategory')
 	.post(function (req, res) {
-		var piscine = new Piscine();
-		piscine.name = req.body.name;
-		piscine.search = req.body.search;
-		piscine.icon = req.body.icon;
-		piscine.list = [];
-		piscine.save(function (err) {
-			if (err) {
-				res.send(err);
-			}
-			res.send(piscine);
-		});
+		var token = req.body.token || req.query.token || req.headers['x-auth-token'];
+		// decode token
+		if (token) {
+			// verifies secret and checks exp
+			jwt.verify(token, app.get('superSecret'), function(err, decoded) {
+				if (err) {
+					info = { success: false, message: 'Failed to authenticate token.' };
+					return res.status(200).send(info);
+				} else {
+					// if everything is good, save to request for use in other routes
+					req.decoded = decoded;
+					info = {
+						success: true,
+						message: '',
+						user: decoded._doc
+					}
+
+					console.log(decoded._doc._id);
+					var category = new Category();
+					category.userId = decoded._doc._id;
+					category.name = req.body.name;
+					category.search = req.body.search;
+					category.icon = req.body.icon;
+					category.list = [];
+					console.log('category',category)
+					category.save(function (err) {
+						if (err) {
+							res.send(err);
+						}
+						res.send(category);
+					});
+					//next();
+				}
+			});
+		}
+
 	});
 
 myRouter.route('/categoryById/:category_id')
 	.get(function (req, res) {
 		console.log(req.params.category_id);
-		Piscine.findById(req.params.category_id, function (err, piscine) {
+		Category.findById(req.params.category_id, function (err, piscine) {
 			if (err)
 				res.send(err);
 			res.json(piscine);
@@ -219,7 +245,7 @@ myRouter.route('/categoryById/:category_id')
 	})
 	.delete(function (req, res) {
 		console.log('delete');
-		Piscine.remove({_id: req.params.category_id}, function (err, piscine) {
+		Category.remove({_id: req.params.category_id}, function (err, piscine) {
 			if (err) {
 				res.send(err);
 			}
@@ -231,7 +257,7 @@ myRouter.route('/categoryById/:category_id')
 myRouter.route('/updateListCategory/:category_id')
 	.put(function (req, res) {
 		console.log('put updateListCategory');
-		Piscine.findById(req.params.category_id, function (err, piscine) {
+		Category.findById(req.params.category_id, function (err, piscine) {
 			if (err) {
 				res.send(err);
 			}
@@ -321,8 +347,9 @@ myRouter.route('/getToken')
                 req.decoded = decoded;
                 info = {
                     success: true,
-                    message: ''
-                }
+                    message: '',
+					user: decoded._doc
+				}
                 return res.send(info);
                 //next();
             }
