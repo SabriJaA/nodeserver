@@ -6,7 +6,7 @@ var config = require('./config');
 var port;
 var urlmongo = '';
 var hostname = '0.0.0.0';
-var prod = true;
+var prod = false;
 
 if (prod) {
 	port = 8080;
@@ -75,9 +75,9 @@ myRouter.route('/')
 myRouter.route('/addUser')
 	.post(function (req, res) {
 		var user = new User();
-		user.first_name = req.body.first_name;
-		user.last_name = req.body.last_name;
-		user.email = req.body.email;
+		user.first_name = req.body.first_name.toLowerCase();
+		user.last_name = req.body.last_name.toLowerCase();
+		user.email = req.body.email.toLowerCase();
 		user.password = (req.body.password) ? req.body.password : '';
 		user.id = req.body.id;
 		user.save(function (err) {
@@ -115,7 +115,7 @@ myRouter.route('/loggin')
 	var info;
     // find the user
     User.findOne({
-        email: req.body.email
+        email: req.body.email.toLowerCase()
     }, function(err, user) {
 
         if (err) {info = err};
