@@ -6,7 +6,7 @@ var config = require('./config');
 var port;
 var urlmongo = '';
 var hostname = '0.0.0.0';
-var prod = false;
+var prod = true;
 
 if (prod) {
     port = 8080;
