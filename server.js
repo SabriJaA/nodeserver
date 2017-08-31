@@ -6,7 +6,7 @@ var config = require('./config');
 var port;
 var urlmongo = '';
 var hostname = '0.0.0.0';
-var prod = true;
+var prod = false;
 
 if (prod) {
     port = 8080;
@@ -74,26 +74,34 @@ myRouter.route('/')
 
 myRouter.route('/addUser')
     .post(function (req, res) {
-        var user = new User();
-        user.first_name = req.body.first_name.toLowerCase();
-        user.last_name = req.body.last_name.toLowerCase();
-        user.email = req.body.email.toLowerCase();
-        user.password = (req.body.password) ? req.body.password : '';
-        user.id = req.body.id;
-        user.save(function (err) {
-            if (err) {
-                res.send(err);
-            }
-            var token = jwt.sign(user, app.get('superSecret'));
-            info = {
-                success: true,
-                message: 'Enjoy your token!',
-                token: token
-            }
-            res.send(info);
-        });
-    });
 
+		if (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(req.body.email.toLowerCase())){
+			var user = new User();
+			user.first_name = req.body.first_name.toLowerCase();
+			user.last_name = req.body.last_name.toLowerCase();
+			user.email = req.body.email.toLowerCase();
+			user.password = (req.body.password) ? req.body.password : '';
+			user.id = req.body.id;
+			user.save(function (err) {
+				if (err) {
+					res.send(err);
+				}
+				var token = jwt.sign(user, app.get('superSecret'));
+				info = {
+					success: true,
+					message: 'Enjoy your token!',
+					token: token
+				}
+				res.send(info);
+			});
+		} else {
+			info = {
+				success: false,
+				message: 'You have entered an invalid email address!',
+				token: ''
+			}
+        }
+    });
 /*myRouter.route('/loggin')
 	.post(function (req, res) {
 		console.log(req.body);
@@ -268,22 +276,39 @@ myRouter.route('/addCategory')
 
 myRouter.route('/categoryById/:category_id')
     .get(function (req, res) {
-        console.log(req.params.category_id);
-        Category.findById(req.params.category_id, function (err, piscine) {
+        console.log(req.body.category_id);
+        Category.findById(req.body.category_id, function (err, piscine) {
             if (err)
                 res.send(err);
             res.json(piscine);
         });
     })
     .delete(function (req, res) {
-        console.log('delete');
-        Category.remove({_id: req.params.category_id}, function (err, piscine) {
-            if (err) {
-                res.send(err);
-            }
-            res.status(200).json({_id: req.params.category_id});
-        });
-
+		var token = req.body.token || req.query.token || req.headers['x-auth-token'];
+		// decode token
+		if (token) {
+			// verifies secret and checks exp
+			jwt.verify(token, app.get('superSecret'), function (err, decoded) {
+				if (err) {
+					info = {success: false, message: 'Failed to authenticate token.'};
+					return res.status(200).send(info);
+				} else {
+					// if everything is good, save to request for use in other routes
+					req.decoded = decoded;
+					info = {
+						success: true,
+						message: '',
+						user: decoded._doc
+					}
+					Category.remove({_id: req.body.category_id, userId: decoded._doc._id}, function (err, piscine) {
+						if (err) {
+							res.send(err);
+						}
+						res.status(200).json({_id: req.params.category_id});
+					});
+				}
+			});
+		}
     });
 
 myRouter.route('/updateListCategory/:category_id')
