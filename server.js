@@ -165,10 +165,8 @@ myRouter.route('/findUserByIdFB/:id')
             var info;
             if (err)
                 res.send(err);
-            console.log(user);
             if (user) {
                 var token = jwt.sign(user[0], app.get('superSecret'));
-                console.log(token);
                 info = {
                     success: true,
                     message: 'Enjoy your token!',
@@ -216,13 +214,11 @@ myRouter.route('/category')
                         message: '',
                         user: decoded._doc
                     }
-                    console.log('decoded._doc._id', decoded._doc._id.toString())
                     Category.find({userId: decoded._doc._id.toString()},
                         function (err, category) {
                             if (err) {
                                 res.send(err);
                             }
-                            console.log('category', category)
                             res.status(200).send(category);
                         });
 
@@ -243,7 +239,7 @@ myRouter.route('/addCategory')
             jwt.verify(token, app.get('superSecret'), function (err, decoded) {
                 if (err) {
                     info = {success: false, message: 'Failed to authenticate token.'};
-                    return res.status(200).send(info);
+                    return res.send(info);
                 } else {
                     // if everything is good, save to request for use in other routes
                     req.decoded = decoded;
@@ -253,14 +249,12 @@ myRouter.route('/addCategory')
                         user: decoded._doc
                     }
 
-                    console.log(decoded._doc._id);
                     var category = new Category();
                     category.userId = decoded._doc._id;
                     category.name = req.body.name;
                     category.search = req.body.search;
                     category.icon = req.body.icon;
                     category.list = [];
-                    console.log('category', category)
                     category.save(function (err) {
                         if (err) {
                             res.send(err);
@@ -291,7 +285,7 @@ myRouter.route('/categoryById/:category_id')
 			jwt.verify(token, app.get('superSecret'), function (err, decoded) {
 				if (err) {
 					info = {success: false, message: 'Failed to authenticate token.'};
-					return res.status(200).send(info);
+					return res.send(info);
 				} else {
 					// if everything is good, save to request for use in other routes
 					req.decoded = decoded;
@@ -300,15 +294,19 @@ myRouter.route('/categoryById/:category_id')
 						message: '',
 						user: decoded._doc
 					}
-					Category.remove({_id: req.body.category_id, userId: decoded._doc._id}, function (err, piscine) {
+					console.log(req.params.category_id);
+					Category.remove({_id: req.params.category_id, userId: decoded._doc._id}, function (err, result) {
 						if (err) {
 							res.send(err);
 						}
-						res.status(200).json({_id: req.params.category_id});
+						console.log('remove');
+						res.status(200).send({_id: req.params.category_id});
 					});
 				}
 			});
-		}
+		}else {
+			res.status(200).send({_id: ''});
+        }
     });
 
 myRouter.route('/updateListCategory/:category_id')
